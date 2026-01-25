@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .card-shadow-custom {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-shadow-custom:hover {
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.4);
+        transform: translateY(-4px);
+    }
+    .job-image-wrapper {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: stretch;
+        justify-content: top;
+    }
+
+    .job-image-wrapper img {
+        height: 100%;
+        width: auto;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+</style>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- ✅ Left Side: Saved Job Cards (70%) -->
+        <div class="col-lg-9 px-5">
+            <h3 class="fw-bold mb-4 text-success">Saved Jobs</h3>
+
+            {% if saved_jobs %}
+            <div class="row g-4">
+                {% for saved in saved_jobs %}
+                <div class="col-12">
+                    <div class="card border-0 card-shadow-custom h-100 rounded-4">
+                        <div class="card-body border border-5">
+                            <div class="row">
+                                <div class="col-10">
+                                    <h5 class="card-title fw-bold text-success">{{ saved.job.role }}</h5>
+                                </div>
+                                <div class="col-1 text-end">
+
+                                    <a href="{% url 'remove_saved_job' saved.id %}" title="Remove from saved jobs">
+                                        <i class="fa-solid fa-bookmark text-danger"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="bi bi-building me-1"></i> {{ saved.job.companyName }}
+                            </h6>
+                            <div class="d-flex justify-content-between text-secondary mb-2 small">
+                                <span><i class="bi bi-geo-alt-fill me-1"></i>{{ saved.job.location }}</span>
+                                <span><i class="bi bi-currency-rupee me-1"></i>{{ saved.job.salary }}</span>
+                            </div>
+                            <div class="job-desc-preview">
+                                <div class="short-desc card-text text-muted"
+                                     style="height:4.2rem; overflow-y: hidden; overflow-x: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                                    {{ saved.job.jobDescription|striptags|truncatechars:250 }}
+                                </div>
+                                <div class="full-desc card-text text-muted d-none">
+                                    {{ saved.job.jobDescription|safe }}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <button class="btn btn-link toggle-desc-btn p-0" style="font-size: 0.9rem;">Read more</button>
+
+                                    <a href="" class="btn btn-sm btn-primary">
+                                        View Job
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted fst-italic">No jobs saved yet. Start browsing and save jobs you like!</p>
+            {% endif %}
+        </div>
+
+        <!-- ✅ Right Side: Sticky Image (30%) -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="job-image-wrapper">
+                <img src="{% static 'images/jobText.jpg' %}" alt="Saved Jobs Illustration">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buttons = document.querySelectorAll(".toggle-desc-btn");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                const parent = btn.closest(".job-desc-preview");
+                const short = parent.querySelector(".short-desc");
+                const full = parent.querySelector(".full-desc");
+
+                const isExpanded = !full.classList.contains("d-none");
+
+                short.classList.toggle("d-none", !isExpanded);
+                full.classList.toggle("d-none", isExpanded);
+                btn.textContent = isExpanded ? "Read more" : "Read less";
+            });
+        });
+    });
+</script>
+{% endblock %}

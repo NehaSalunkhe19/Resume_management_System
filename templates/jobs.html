@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .card-shadow-custom {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-shadow-custom:hover {
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.4);
+        transform: translateY(-4px);
+    }
+    .job-image-wrapper {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: stretch;
+        justify-content: top;
+    }
+
+    .job-image-wrapper img {
+        height: 100%;
+        width: auto;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+<!--    .save-btn {-->
+<!--    background-color: #28a745;-->
+<!--    color: white;-->
+<!--    padding: 8px 12px;-->
+<!--    border: none;-->
+<!--    border-radius: 5px;-->
+<!--    font-size: 16px;-->
+<!--  }-->
+
+<!--  .save-btn i {-->
+<!--    margin-right: 5px;-->
+<!--  }-->
+</style>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- ✅ Left Side: Job Cards (70%) -->
+        <div class="col-lg-9 px-5">
+            <!-- Search Bar -->
+            <form method="GET" action="{% url 'jobs' %}" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control rounded-start-pill"
+                           placeholder="Search jobs by role, company, location..."
+                           value="{{ request.GET.search }}">
+                    <button class="btn btn-success rounded-end-pill px-4" type="submit">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+            {% if messages %}
+            <div class="container mt-3">
+                {% for msg in messages %}
+                <div class="alert alert-dismissible fade show w-50 auto-hide-alert" role="alert"
+                     style="background-color: #BE5985; color:#fff">
+                    <strong>{{ msg }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Job Cards -->
+            <div class="row g-4">
+                {% for job in jobs %}
+                <div class="col-12">
+                    <div class="card border-0 card-shadow-custom h-100 rounded-4">
+                        <div class="card-body border border-5">
+                            <div class="row">
+                                <div class="col-10">
+                                    <h5 class="card-title fw-bold text-success">{{ job.role }}</h5>
+                                </div>
+                                <div class="col-1">
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'savedJobs' job.id %} "><i class="fa-regular fa-bookmark"></i></a>
+
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="bi bi-building me-1"></i> {{ job.companyName }}
+                            </h6>
+                            <div class="d-flex justify-content-between text-secondary mb-2 small">
+                                <span><i class="bi bi-geo-alt-fill me-1"></i>{{ job.location }}</span>
+                                <span><i class="bi bi-currency-rupee me-1"></i>{{ job.salary }}</span>
+                            </div>
+                            <div class="job-desc-preview">
+                                <div class="short-desc card-text text-muted"
+                                     style="height:4.2rem; overflow-y: hidden; overflow-x: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                                    {{ job.jobDescription|striptags|truncatechars:250 }}
+                                </div>
+                                <div class="full-desc card-text text-muted d-none">
+                                    {{ job.jobDescription|safe }}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <button class="btn btn-link toggle-desc-btn p-0" style="font-size: 0.9rem;">Read
+                                        more
+                                    </button>
+
+                                    {% if job.id not in applied_jobs %}
+                                    {% if user.is_authenticated %}
+                                    <a href="" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                       data-bs-target="#applyModal{{ job.id }}">Apply Now</a>
+                                    {% else %}
+                                    <a href="{% url 'customlogin' %}"> login to apply
+                                    </a>
+                                    {% endif %}
+                                    {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled>Already Applied</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Apply Modal -->
+                    <div class="modal fade" id="applyModal{{ job.id }}" tabindex="-1"
+                         aria-labelledby="applyModalLabel{{ job.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded-4 border-0 shadow" style="background-color: #fff0ea;">
+                                <form method="POST" action="{% url 'submit_application' job.id %}"
+                                      enctype="multipart/form-data">
+                                    {% csrf_token %}
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header border-0 rounded-top-4" style="background-color: #FBCEB5;">
+                                        <h5 class="modal-title fw-bold text-dark" id="applyModalLabel{{ job.id }}">
+                                            Apply for <span class="text-danger-emphasis">{{ job.role }}</span>
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"
+                                                style="filter: brightness(0.4);"></button>
+                                    </div>
+
+                                    <!-- Modal Body -->
+                                    <div class="modal-body px-4 py-3">
+
+                                        <!-- Username -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-dark">Username</label>
+                                            <input type="text" class="form-control border-0 rounded-3 bg-light-subtle"
+                                                   value="{{ request.user.username }}" readonly>
+                                        </div>
+
+                                        <!-- Location -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-dark">Your Location</label>
+                                            <input type="text" name="location"
+                                                   class="form-control border-0 rounded-3 bg-light-subtle"
+                                                   value="{{ userinfo.currentLocation }}" readonly>
+                                        </div>
+
+                                        <!-- Resume Preview -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-dark">Current Resume</label>
+                                            {% if userinfo.resume %}
+                                            <p class="mb-0">
+                                                <a href="{{ userinfo.resume.url }}" target="_blank"
+                                                   class="text-decoration-none fw-medium text-danger">
+                                                    {{ userinfo.resume.name }}
+                                                </a>
+                                            </p>
+                                            {% else %}
+                                            <p class="text-muted fst-italic">No resume uploaded</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Upload New Resume Checkbox -->
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="uploadResumeCheck{{ job.id }}"
+                                                   onchange="toggleResumeUpload({{ job.id }})">
+                                            <label class="form-check-label text-dark"
+                                                   for="uploadResumeCheck{{ job.id }}">
+                                                Upload new resume?
+                                            </label>
+                                        </div>
+
+                                        <!-- Upload Field (Hidden Initially) -->
+                                        <div class="mb-3 d-none" id="newResumeField{{ job.id }}">
+                                            <label class="form-label text-dark fw-semibold">Upload New Resume</label>
+                                            <input type="file" class="form-control border-0 bg-light-subtle rounded-3"
+                                                   name="new_resume" accept=".pdf,.doc,.docx">
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer border-0 px-4 pb-4">
+                                        <button type="submit"
+                                                class="btn w-100 fw-semibold text-white"
+                                                style="background-color: #FF5D6C; border-radius: 1rem;">
+                                            Submit Application
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ✅ Right Side: Sticky Image (30%) -->
+        <div class="col-lg-3 d-none d-lg-block">
+
+            <div class="job-image-wrapper">
+                <img src="{% static 'images/jobText.jpg' %}" alt="Job Illustration">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buttons = document.querySelectorAll(".toggle-desc-btn");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                const parent = btn.closest(".job-desc-preview");
+                const short = parent.querySelector(".short-desc");
+                const full = parent.querySelector(".full-desc");
+
+                const isExpanded = !full.classList.contains("d-none");
+
+                short.classList.toggle("d-none", !isExpanded);
+                full.classList.toggle("d-none", isExpanded);
+                btn.textContent = isExpanded ? "Read more" : "Read less";
+            });
+        });
+    });
+
+    function toggleResumeUpload(jobId) {
+        const checkbox = document.getElementById(`uploadResumeCheck${jobId}`);
+        const uploadField = document.getElementById(`newResumeField${jobId}`);
+        if (checkbox.checked) {
+            uploadField.classList.remove('d-none');
+        } else {
+            uploadField.classList.add('d-none');
+        }
+    }
+    setTimeout(function () {
+            let alerts = document.querySelectorAll('.auto-hide-alert');
+            alerts.forEach(function (alert) {
+                // Bootstrap's dismiss
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+            });
+        }, 5000);
+</script>
+{% endblock %}

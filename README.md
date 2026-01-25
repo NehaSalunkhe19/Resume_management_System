@@ -1,0 +1,1 @@
+# ResumeManagement_DjangoProject

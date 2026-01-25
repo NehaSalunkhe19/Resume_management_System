@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .card-shadow-custom {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-shadow-custom:hover {
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.4);
+        transform: translateY(-4px);
+    }
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 12px;
+    }
+       .status-date {
+        font-size: 0.75rem;
+        color: #d3d5d7;
+        margin-top: 4px;
+        display: block;
+    }
+        .job-image-wrapper {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: stretch;
+        justify-content: top;
+    }
+
+    .job-image-wrapper img {
+        height: 100%;
+        width: auto;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+</style>
+
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- ✅ Left Side: Job Applications -->
+        <div class="col-lg-9 px-5">
+            <h3 class="fw-bold mb-4 text-primary">My Applications</h3>
+
+            {% if jobOfUser %}
+            <div class="row g-4">
+                {% for app in jobOfUser %}
+                <div class="col-12">
+                    <div class="card border-0 card-shadow-custom h-100 rounded-4">
+                        <div class="card-body border border-5">
+                            <div class="row">
+                                <div class="col-10">
+                                    <h5 class="card-title fw-bold text-success">{{ app.job.role }}</h5>
+                                </div>
+                            </div>
+
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="bi bi-building me-1"></i> {{ app.job.companyName }}
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary small">
+                                    <i class="bi bi-currency-rupee me-1"></i>{{ app.job.salary }}
+                                </span>
+
+                                <!-- ✅ Application Status Badge -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <!-- Left Side: Salary -->
+
+
+                                    <!-- Right Side: Status + Updated Date -->
+                                    <div class="text-end">
+        <span class="status-badge
+            {% if app.status == 'applied' %} bg-primary text-white
+            {% elif app.status == 'approved' %} bg-success text-white
+            {% elif app.status == 'rejected' %} bg-danger text-white
+            {% else %} bg-secondary text-white {% endif %}">
+            {{ app.status|title }}
+        </span>
+                                        <div class="mt-1 text-muted small">
+                                            Updated: {{ app.statusUpdatedDate|date:"M d, Y" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted fst-italic">You haven’t applied for any jobs yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- ✅ Right Side: Sticky Image -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="job-image-wrapper">
+                <img src="{% static 'images/jobText.jpg' %}" alt="Applications Illustration" class="rounded-4">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

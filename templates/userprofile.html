@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .profile-wrapper {
+        background-color: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #82b74b;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #405d27;
+        border-bottom: 2px solid #c1946a;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    label {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .btn-accent {
+        background-color: #82b74b;
+        color: white;
+        font-weight: 500;
+    }
+
+    .btn-accent:hover {
+        background-color: #405d27;
+        color: white;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .bordered-box {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        background-color: #f9f9f9;
+    }
+.dashboard-card {
+    height: 250px; /* fixed height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+    border-color: rgba(0,0,0,0.15);
+  }
+
+  .dashboard-card h5 {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-card p {
+    flex-grow: 1;
+    margin-bottom: 15px;
+    color: #444;
+  }
+
+  /* Different color combinations */
+  .card-yellow {
+    background: linear-gradient(135deg, #fff8e1, #ffe082);
+    border-color: #ffd54f;
+  }
+
+  .card-blue {
+    background: linear-gradient(135deg, #e1f5fe, #81d4fa);
+    border-color: #4fc3f7;
+  }
+
+  .card-green {
+    background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
+    border-color: #81c784;
+  }
+
+  .card-red {
+    background: linear-gradient(135deg, #ffebee, #ef9a9a);
+    border-color: #e57373;
+  }
+
+</style>
+
+<div class="container py-5  border border-4 border-success shadow-lg">
+    <div class="row g-4">
+
+        <!-- Job Recommendations -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card card-yellow">
+                <h5 class="text-primary"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Job Recommendations</h5>
+                <p>Based on your skills and past applications, we’ve found jobs that match your profile perfectly.</p>
+                <a href="#" class="btn btn-warning text-white btn-sm px-3">Recommended Jobs</a>
+            </div>
+        </div>
+
+        <!-- Application Status -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card card-blue">
+                <h5 class="text-info"><i class="bi bi-hourglass-split text-info me-2"></i>Application Status</h5>
+                <p>Track the status of all your job applications in real time.</p>
+                <a href="{% url 'application_status' %}" class="btn btn-info text-white btn-sm px-3">Check My
+                    Applications</a>
+            </div>
+        </div>
+
+        <!-- Profile Completion -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card card-green">
+                <h5 class="text-success"><i class="bi bi-person-lines-fill text-success me-2"></i>Profile Completion
+                </h5>
+                <p>Complete your profile to increase your chances of getting hired.</p>
+                <div>
+                    <div class="progress mb-3" style="height: 10px; border-radius: 5px;">
+                        <div class="progress" style="height: 25px;">
+  <div class="progress-bar bg-success"
+       role="progressbar"
+       style="width: {{ profile_completion }}%;"
+       aria-valuenow="{{ profile_completion }}"
+       aria-valuemin="0"
+       aria-valuemax="100">
+    {{ profile_completion }}%
+      <p>DEBUG: {{ profile_completion }}</p>
+  </div>
+
+</div>
+                    </div>
+                    <a href="#" class="btn btn-success btn-sm px-3">Complete Profile</a>
+                </div>
+            </div>
+            <p>DEBUG: {{ profile_completion }}</p>
+        </div>
+
+        <!-- Saved Jobs -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card card-red">
+                <h5 class="text-danger"><i class="bi bi-bookmark-heart-fill text-danger me-2"></i>Saved Jobs</h5>
+                <p>Jobs you’ve bookmarked to apply later are just a click away.</p>
+                <a href="{% url 'saveJobList' %}" class="btn btn-danger text-white btn-sm px-3">View Saved Jobs</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="container mt-0">
+    {% if messages %}
+    <div class="container">
+        {% for msg in messages %}
+        <div class="alert  alert-dismissible fade show w-50" role="alert" style="background-color: #BE5985; color:#fff">
+            <strong>{{msg}}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <div class="profile-wrapper border border-4 border-success shadow-lg">
+
+        <form method="POST" enctype="multipart/form-data" action="{% url 'userprofile' %}">
+            {% csrf_token %}
+
+            <!-- Profile Image & Basic Info -->
+            <div class="row align-items-start mb-5">
+                <!-- Left: Profile Image -->
+                <div class="col-md-3 text-center">
+                    {% if userinfo.profile_image %}
+                    <img id="previewImage" src="{{ userinfo.profile_image.url }}" class="profile-pic"
+                         alt="Profile Picture">
+                    {% else %}
+                    <img id="previewImage" src="{% static 'images/default.png' %}" class="profile-pic"
+                         alt="Default Image">
+                    {% endif %}
+
+                    <label for="profile_image" class="mt-2">Update Profile Picture</label>
+                    <input type="file" name="profile_image" id="profile_image" class="form-control mt-2"
+                           onchange="previewProfileImage(event)">
+                </div>
+
+                <!-- Right: Personal Details -->
+                <div class="col-md-9 pt-2 ">
+                    <h4 class="section-title">Personal Details</h4>
+                    <div class="row g-3 pt-3">
+                        <div class="col-md-4">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" class="form-control" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="text" id="mobile" name="mobile" class="form-control"
+                                   value="{{ user.mobile|default_if_none:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="address">Current Address</label>
+                            <input type="text" id="address" name="address" class="form-control"
+                                   value="{{ userinfo.currentLocation|default_if_none:'' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <h4 class="section-title">Education</h4>
+            {% if courses %}
+            {% for course in courses %}
+            <div class="row g-3 bordered-box">
+                <input type="hidden" name="course_id_{{ forloop.counter }}" value="{{ course.id }}">
+                <div class="col-md-3">
+                    <label>Course Name</label>
+                    <input type="text" class="form-control" name="course_name_{{ forloop.counter }}"
+                           value="{{ course.course_name }}">
+                </div>
+                <div class="col-md-3">
+                    <label>College</label>
+                    <input type="text" class="form-control" name="college_{{ forloop.counter }}"
+                           value="{{ course.college }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Passout Year</label>
+                    <input type="number" class="form-control" name="passout_year_{{ forloop.counter }}"
+                           value="{{ course.passout_year }}">
+                </div>
+                <div class="col-md-3">
+                    <label>CGPA</label>
+                    <input type="text" class="form-control" name="cgpa_{{ forloop.counter }}" value="{{ course.cgpa }}">
+                </div>
+            </div>
+            {% endfor %}
+            <input type="hidden" name="total_courses" value="{{ courses|length }}">
+            {% else %}
+            <p>No education records found.</p>
+            <input type="hidden" name="total_courses" value="0">
+            {% endif %}
+
+            <!-- Add New Education -->
+            <h5 class="mt-4">Add New Education</h5>
+            <div class="row g-3 bordered-box">
+                <div class="col-md-3">
+                    <label>Course Name</label>
+                    <input type="text" class="form-control" name="new_course_name">
+                </div>
+                <div class="col-md-3">
+                    <label>College</label>
+                    <input type="text" class="form-control" name="new_college">
+                </div>
+                <div class="col-md-3">
+                    <label>Passout Year</label>
+                    <input type="number" class="form-control" name="new_passout_year">
+                </div>
+                <div class="col-md-3">
+                    <label>CGPA</label>
+                    <input type="text" class="form-control" name="new_cgpa">
+                </div>
+            </div>
+
+            <!-- Experience Section -->
+            <h4 class="section-title mt-5">Experience</h4>
+            {% if experiences %}
+            {% for exp in experiences %}
+            <div class="row g-3 bordered-box">
+                <input type="hidden" name="exp_id_{{ forloop.counter }}" value="{{ exp.id }}">
+                <div class="col-md-4">
+                    <label>Role</label>
+                    <input type="text" class="form-control" name="role_{{ forloop.counter }}" value="{{ exp.role }}">
+                </div>
+                <div class="col-md-4">
+                    <label>Company Name</label>
+                    <input type="text" class="form-control" name="company_name_{{ forloop.counter }}"
+                           value="{{ exp.company_name }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="currently_working_{{ forloop.counter }}"
+                               {% if exp.currently_working %}checked{% endif %}>
+                        <label class="form-check-label">
+                            Currently Working
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <input type="hidden" name="total_experiences" value="{{ experiences|length }}">
+            {% else %}
+            <p>No experience records found.</p>
+            <input type="hidden" name="total_experiences" value="0">
+            {% endif %}
+
+            <!-- Add New Experience -->
+            <h5 class="mt-4">Add New Experience</h5>
+            <div class="row g-3 bordered-box">
+                <div class="col-md-4">
+                    <label>Role</label>
+                    <input type="text" class="form-control" name="new_role">
+                </div>
+                <div class="col-md-4">
+                    <label>Company Name</label>
+                    <input type="text" class="form-control" name="new_company_name">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="new_currently_working">
+                        <label class="form-check-label">
+                            Currently Working
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <h4 class="section-title mt-5">Skills</h4>
+            <div class="row g-3 bordered-box">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-5">
+                            {% for i in userSkills %}
+                            <div class="skill-tag d-flex align-items-center mb-2">
+                                <input type="hidden" name="saved_skills" value="{{ i.id }}">
+                                <input type="text" class="form-control" value="{{ i }}" readonly>
+                                <button type="button" class="btn btn-sm btn-danger ms-2 remove-skill">×</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+
+                    <label for="skills">Select Skills</label>
+                    <select name="skills" id="skills" class="form-select" multiple>
+
+
+                        {% for skill in skills %}
+                        <option value="{{ skill.id }}"
+                                {% if skill.id in user_selected_skills %}selected{% endif %}>
+                            {{ skill.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resume Section -->
+            <h4 class="section-title mt-5">Resume</h4>
+            {% if userinfo.resume %}
+            <p><strong>Resume:</strong> {{ userinfo.resume.name }}</p>
+            <a href="{{ userinfo.resume.url }}" class="btn btn-outline-primary btn-sm mb-2" download>Download Resume</a>
+            {% else %}
+            <p>No resume uploaded.</p>
+            {% endif %}
+            <label for="resume">Upload/Replace Resume</label>
+            <input type="file" name="resume" id="resume" class="form-control mt-2">
+
+            <!-- Submit Button -->
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-accent px-4 py-2">Save Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript for Live Preview -->
+<script>
+    function previewProfileImage(event) {
+        const preview = document.getElementById('previewImage');
+        const fileInput = event.target;
+        const file = fileInput.files[0];
+
+        // Allowed image types
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif'];
+
+        if (file) {
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please upload a valid image file (JPG, PNG, WEBP, etc.)');
+                fileInput.value = ''; // Clear the invalid file
+                preview.src = "{% static 'images/default.png' %}"; // Reset preview if needed
+                return;
+            }
+
+            // Valid image → show preview
+            preview.src = URL.createObjectURL(file);
+        }
+    }
+
+  $(document).ready(function() {
+      $('#skills').select2({
+          placeholder: "Search and select skills",
+          allowClear: true,
+          width: '100%'
+      });
+  });
+
+$(document).on("click", ".remove-skill", function() {
+    $(this).closest(".skill-tag").remove();
+});
+
+     window.addEventListener("load", function() {
+    let bar = document.getElementById("progress-bar");
+    let progress = bar.getAttribute("data-progress");
+    bar.style.width = progress + "%";
+    bar.textContent = progress + "%";
+  });
+</script>
+{% endblock %}
